@@ -52,9 +52,9 @@ namespace OnlineStoreAPI.Controllers
         [HttpGet("{userId}")]
         public async Task<ActionResult<Cart>> GetCart(int userId)
         {
-            var cart = await _context.Carts.Include(c => c.Items)
-                                           .ThenInclude(i => i.ProductId)
-                                           .FirstOrDefaultAsync(c => c.UserId == userId);
+            var cart = await _context.Carts
+                                     .Include(c => c.Items) // Include Items directly
+                                     .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
             {
@@ -63,5 +63,6 @@ namespace OnlineStoreAPI.Controllers
 
             return Ok(cart);
         }
+
     }
 }
