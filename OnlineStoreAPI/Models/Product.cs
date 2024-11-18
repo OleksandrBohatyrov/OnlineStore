@@ -9,4 +9,6 @@
         public int Stock { get; set; }
         public string Currency { get; set; }
     }
+
+
 }
