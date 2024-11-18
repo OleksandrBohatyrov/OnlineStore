@@ -33,6 +33,41 @@ namespace OnlineStoreAPI.Controllers
 
             return Ok(cart); // Возвращаем полную модель Cart
         }
+        [HttpPost("{userId}/checkout")]
+public async Task<ActionResult> Checkout(int userId)
+{
+    var cart = await _context.Carts
+        .Include(c => c.Items)
+        .ThenInclude(i => i.Product)
+        .FirstOrDefaultAsync(c => c.UserId == userId);
+
+    if (cart == null || !cart.Items.Any())
+    {
+        return NotFound("Cart not found or empty.");
+    }
+
+    // Проверка наличия товаров на складе
+    foreach (var item in cart.Items)
+    {
+        if (item.Product.Stock < item.Quantity)
+        {
+            return BadRequest($"Not enough stock for product {item.Product.Name}.");
+        }
+    }
+
+    // Обновляем количество товаров на складе
+    foreach (var item in cart.Items)
+    {
+        item.Product.Stock -= item.Quantity;
+    }
+
+    // Очистка корзины
+    _context.CartItems.RemoveRange(cart.Items);
+    await _context.SaveChangesAsync();
+
+    return Ok("Payment successful, cart has been checked out.");
+}
+
 
 
 
