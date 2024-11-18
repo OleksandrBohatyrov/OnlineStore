@@ -32,7 +32,6 @@ namespace OnlineStoreAPI.Controllers
             }
 
             var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
-
             if (cartItem == null)
             {
                 cartItem = new CartItem { ProductId = productId, Quantity = quantity, CartId = cart.Id };
@@ -49,12 +48,13 @@ namespace OnlineStoreAPI.Controllers
             return Ok(cart);
         }
 
+
         [HttpGet("{userId}")]
         public async Task<ActionResult<Cart>> GetCart(int userId)
         {
             var cart = await _context.Carts
-                                     .Include(c => c.Items) // Include Items directly
-                                     .FirstOrDefaultAsync(c => c.UserId == userId);
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
             {
@@ -63,6 +63,7 @@ namespace OnlineStoreAPI.Controllers
 
             return Ok(cart);
         }
+
 
     }
 }
