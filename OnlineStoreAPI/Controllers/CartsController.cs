@@ -63,6 +63,30 @@ namespace OnlineStoreAPI.Controllers
 
             return Ok(cart);
         }
+        [HttpDelete("{userId}/remove")]
+        public async Task<ActionResult> RemoveFromCart(int userId, int productId)
+        {
+            var cart = await _context.Carts
+                .Include(c => c.Items)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                return NotFound("Cart not found.");
+            }
+
+            var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            if (cartItem == null)
+            {
+                return NotFound("Product not found in cart.");
+            }
+
+            cart.Items.Remove(cartItem);
+            _context.CartItems.Remove(cartItem);
+            await _context.SaveChangesAsync();
+
+            return Ok(cart);
+        }
 
 
     }
