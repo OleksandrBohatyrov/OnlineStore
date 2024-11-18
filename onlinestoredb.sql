@@ -25,7 +25,7 @@ CREATE TABLE `carts` (
 ) ENGINE=InnoDB;
 
 
-CREATE TABLE `cart_items` (
+CREATE TABLE `cartitems` (
     `Id` INT NOT NULL AUTO_INCREMENT,
     `ProductId` INT NOT NULL,
     `Quantity` INT NOT NULL,
