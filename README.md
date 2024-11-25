@@ -54,7 +54,7 @@ The Online Store project is a user-friendly website enabling users to:
 - Utilize Blazor for internal styling and create custom designs using Figma.
 
 ### Task Management
-- Manage tasks, roles, and Scrum meetings using JIRA.
+- Manage tasks, roles, and Scrum meetings using [JIRA]([https://github.com/artursuskevits/OnlineStoreFrontend](https://sigmakripery.atlassian.net/jira/software/projects/SCRUM/boards/1?atlOrigin=eyJpIjoiMDBiYzUyOWUwMTg4NGI2NGFkYTQxZGQwNmFiMWRmYjUiLCJwIjoiaiJ9)).
 
 ---
 
