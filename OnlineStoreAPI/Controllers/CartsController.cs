@@ -2,8 +2,10 @@
 using OnlineStoreAPI.Data;
 using OnlineStoreAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using OnlineStoreAPI.Services;
 
 namespace OnlineStoreAPI.Controllers
 {
@@ -12,10 +14,12 @@ namespace OnlineStoreAPI.Controllers
     public class CartsController : ControllerBase
     {
         private readonly StoreContext _context;
+        private readonly EmailService _emailService; // Добавляем EmailService
 
-        public CartsController(StoreContext context)
+        public CartsController(StoreContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService; // Внедрение зависимости EmailService через конструктор
         }
 
         [HttpGet("{userId}")]
@@ -34,41 +38,59 @@ namespace OnlineStoreAPI.Controllers
             return Ok(cart); // Возвращаем полную модель Cart
         }
         [HttpPost("{userId}/checkout")]
-public async Task<ActionResult> Checkout(int userId)
-{
-    var cart = await _context.Carts
-        .Include(c => c.Items)
-        .ThenInclude(i => i.Product)
-        .FirstOrDefaultAsync(c => c.UserId == userId);
-
-    if (cart == null || !cart.Items.Any())
-    {
-        return NotFound("Cart not found or empty.");
-    }
-
-    // Проверка наличия товаров на складе
-    foreach (var item in cart.Items)
-    {
-        if (item.Product.Stock < item.Quantity)
+        public async Task<ActionResult> Checkout(int userId)
         {
-            return BadRequest($"Not enough stock for product {item.Product.Name}.");
+            var cart = await _context.Carts
+                .Include(c => c.Items)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null || !cart.Items.Any())
+            {
+                return NotFound("Cart not found or empty.");
+            }
+
+            // Проверка наличия товаров на складе
+            foreach (var item in cart.Items)
+            {
+                if (item.Product.Stock < item.Quantity)
+                {
+                    return BadRequest($"Not enough stock for product {item.Product.Name}.");
+                }
+            }
+
+            // Формирование списка купленных товаров для email и подсчёт итоговой суммы
+            var purchasedItems = new List<(string ProductName, int Quantity, decimal Price)>();
+            decimal totalAmount = 0;
+
+            foreach (var item in cart.Items)
+            {
+                purchasedItems.Add((item.Product.Name, item.Quantity, item.Product.Price));
+                totalAmount += item.Quantity * item.Product.Price;
+            }
+
+            // Обновляем количество товаров на складе
+            foreach (var item in cart.Items)
+            {
+                item.Product.Stock -= item.Quantity;
+            }
+
+            // Очистка корзины
+            _context.CartItems.RemoveRange(cart.Items);
+            await _context.SaveChangesAsync();
+
+            // Получение данных покупателя для отправки email
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
+
+            // Отправка письма о подтверждении оплаты с корректными данными
+            _emailService.SendPaymentConfirmationEmail(user.Email, user.Username, purchasedItems, totalAmount);
+
+            return Ok("Payment successful and confirmation email sent.");
         }
-    }
-
-    // Обновляем количество товаров на складе
-    foreach (var item in cart.Items)
-    {
-        item.Product.Stock -= item.Quantity;
-    }
-
-    // Очистка корзины
-    _context.CartItems.RemoveRange(cart.Items);
-    await _context.SaveChangesAsync();
-
-    return Ok("Payment successful, cart has been checked out.");
-}
-
-
 
 
         [HttpDelete("{userId}/remove")]
@@ -130,13 +152,10 @@ public async Task<ActionResult> Checkout(int userId)
             return Ok(cart);
         }
 
-
         public class CartItemDto
         {
             public int ProductId { get; set; }
             public int Quantity { get; set; }
         }
-
-
     }
 }

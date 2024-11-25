@@ -1,6 +1,7 @@
 ﻿using OnlineStoreAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using OnlineStoreAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +27,14 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-
+builder.Services.AddScoped<EmailService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+
 
 // Подключение CORS
 app.UseCors("AllowBlazorApp");
