@@ -208,9 +208,8 @@ describe('SolomikovPod Online Store - Menu Button Functionality', () => {
 - Validates stock availability during checkout.
 
 **Recommendations**:
-1. Remove inappropriate placeholders (e.g., `"denis loh suka"`).
-2. Consolidate overlapping logic with `CartsController` into a shared service.
-3. Replace string-based responses with structured objects for better readability.
+1. Consolidate overlapping logic with `CartsController` into a shared service.
+2. Replace string-based responses with structured objects for better readability.
 
 #### ProductsController
 **Positive Aspects**:
