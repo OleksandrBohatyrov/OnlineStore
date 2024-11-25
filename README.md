@@ -1,5 +1,5 @@
 # Online Store Project
-
+- Front-end [GitHub Repo](https://github.com/artursuskevits/OnlineStoreFrontend)
 ## Overview
 The Online Store project is a user-friendly website enabling users to:
 - View products
