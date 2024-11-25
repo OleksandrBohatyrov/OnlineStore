@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineStoreAPI.Models;
+using SolomikovPod.Models; // Added to reference the User entity
 
 namespace OnlineStoreAPI.Data
 {
@@ -10,7 +11,7 @@ namespace OnlineStoreAPI.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; } // This will now correctly reference SolomikovPod.Models.User
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +25,5 @@ namespace OnlineStoreAPI.Data
                 .WithOne(ci => ci.Cart)
                 .HasForeignKey(ci => ci.CartId);
         }
-
     }
 }

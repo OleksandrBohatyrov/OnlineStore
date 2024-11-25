@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineStoreAPI.Data;
 using OnlineStoreAPI.Models;
+using SolomikovPod.Models;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,19 +22,34 @@ namespace OnlineStoreAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(User user)
+        public async Task<ActionResult<User>> Register(LoginRequest userRequest)
         {
-            if (_context.Users.Any(u => u.Username == user.Username))
+            if (_context.Users.Any(u => u.Username == userRequest.Username))
             {
                 return BadRequest("Username already exists.");
             }
 
-            user.PasswordHash = HashPassword(user.PasswordHash);
+            if (string.IsNullOrEmpty(userRequest.Password))
+            {
+                return BadRequest("Password is required.");
+            }
+
+            // Hash the password and create the user object
+            var user = new User
+            {
+                Username = userRequest.Username,
+                PasswordHash = HashPassword(userRequest.Password), // Only store the hash
+                Email = userRequest.Email // Assuming userRequest has an Email field
+            };
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
             return Ok(user);
         }
+
+
+
 
         [HttpPost("login")]
         public async Task<ActionResult<User>> Login([FromBody] LoginRequest loginRequest)
@@ -70,6 +86,8 @@ namespace OnlineStoreAPI.Controllers
         {
             public string Username { get; set; }
             public string Password { get; set; }
+
+            public string Email { get; set; }
         }
     }
 }
