@@ -82,7 +82,7 @@ Testing ensures that the application meets functional and non-functional require
 
 - Should logout user and redirect to login page when clicking Logout button
 
-Test folder in repository [https://github.com/OleksandrBohatyrov/OnlineStore/tree/master/Cypress/e2e]
+Test folder in repository [Folder][https://github.com/OleksandrBohatyrov/OnlineStore/tree/master/Cypress/e2e]
 
 ---
 
